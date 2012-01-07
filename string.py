@@ -42,4 +42,4 @@ if __name__ == "__main__":
             'ullamcorper arcu, quis scelerisque orci ornare nec. Donec ',
             'vitae urna ac arcu ultricies posuere. Morbi fermentum molestie ',
             'libero, eu ultricies orci placerat eget.', 
-            columns=70, indent=4)
+            columns=40, indent=4)
