@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-import re
-import sys
-
 # Providing Verification
 # ======================
 # Even with its very simple interface, this module could provide some useful
@@ -35,110 +32,104 @@ import sys
 # planning to add a 'strip' argument to get_command().  I can't decide if the
 # default should be true or false.
 
-class Simple(object):
+import sys, re
+from os.path import basename, splitext
 
-    def __init__(self):
+my_arguments = sys.argv[:]
+my_command = splitext(basename(my_arguments.pop(0)))[0]
 
-        self.arguments = sys.argv[:]
-        self.command = self.arguments.pop(0)
+my_flags = []
+my_options = {}
+my_positional = []
 
-        self.flags = []
-        self.options = {}
-        self.positional = []
+flag_pattern = re.compile(r"-(\w+)")
+option_pattern = re.compile(r"--(\w+)(?:=(\S+))?")
 
-        flag_pattern = re.compile(r"-(\w+)")
-        option_pattern = re.compile(r"--(\w+)(?:=(\S+))?")
+for argument in my_arguments:
 
-        for argument in self.arguments:
+    flag_match = flag_pattern.match(argument)
+    option_match = option_pattern.match(argument)
 
-            flag_match = flag_pattern.match(argument)
-            option_match = option_pattern.match(argument)
+    if flag_match:
+        characters = [flag for flag in flag_match.groups()]
+        my_flags.extend(characters)
 
-            if flag_match:
-                characters = [flag for flag in flag_match.groups()]
-                self.flags.extend(characters)
+    elif option_match:
+        name, value = option_match.groups()
+        my_options[name] = value
 
-            elif option_match:
-                name, value = option_match.groups()
-                self.options[name] = value
+    else:
+        my_positional.append(argument)
 
-            else:
-                self.positional.append(argument)
+def command():
+    return my_command
 
-    def get_command(self):
-        return self.command
+def positional():
+    return my_positional
 
-    def get_flags(self):
-        return self.flags
+def index(index):
+    try:
+        return my_positional[index]
+    except IndexError:
+        return None
 
-    def get_positional(self):
-        return self.positional
+def count():
+    return len(my_positional)
 
-    def has_flag(self, name):
-        return name in self.flags
-
-    def get_flag(self, name, yes=True, no=False):
-        return yes if self.has_flag(name) else no
-
-    def has_option(self, name):
-        return name in self.options
-
-    def get_option(self, name, default=None, values=None, cast=lambda x: x):
-        if values is not None:
-            default = values[0]
-
-        option = self.options.get(name, default)
-        value = cast(option)
-
-        if values is not None:
-            assert value in values
-
-        return value
-
-    def get_options(self):
-        return self.options
-
-    def get_index(self, index):
-        return self.positional[index]
-
-    def has_any(self, *names):
-        for name in names:
-            if self.has_flag(name): return True
-            if self.has_option(name): return True
-        return False
-
-    def has_all(self, *names):
-        for name in names:
-            if self.has_flag(name): continue
-            if self.has_option(name): continue
-            return False
-        return True
-
-parser = Simple()
-
-# The strip argument would get rid of any directories included in the command
-# name.
-
-def command(strip=True):
-    return parser.get_command()
-
-def option(name, default=None, values=None, cast=lambda x: x):
-    return parser.get_option(name, default, values, cast)
-
-def flag(name, yes=True, no=False):
-    return parser.get_flag(name, yes, no)
-
-def any(*names):
-    return parser.has_any(*names)
+def empty():
+    return len(my_positional) == 0
 
 def first():
-    return parser.index(0)
+    return index(0)
 
 def second():
-    return parser.index(1)
+    return index(1)
 
 def third():
-    return parser.index(2)
+    return index(2)
+
+def flag(name, yes=True, no=False):
+    return yes if has_flag(name) else no
+
+def flags():
+    return my_flags
+
+def option(name, default=None, values=None, cast=lambda x: x):
+
+    if values is not None:
+        default = values[0]
+
+    option = my_options.get(name, default)
+    value = cast(option)
+
+    if values is not None:
+        assert value in values
+
+    return value
+
+def options():
+    return my_options
+
+def has_flag(name):
+    return name in my_flags
+
+def has_option(name):
+    return name in my_options
+
+def has_any(*names):
+    for name in names:
+        if has_flag(name): return True
+        if has_option(name): return True
+    return False
+
+def has_all(*names):
+    for name in names:
+        if has_flag(name): continue
+        if has_option(name): continue
+        return False
+    return True
+
+# These tests probably don't work anymore.  I haven't run them in a long time.
 
 if __name__ == "__main__":
 
@@ -203,4 +194,3 @@ if __name__ == "__main__":
     print "All tests passed!"
 
     
-
