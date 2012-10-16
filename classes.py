@@ -1,7 +1,6 @@
-import inspect
-
-def singleton(Class):
+def singleton(cls):
     """ Decorator function that turns a class into a singleton. """
+    import inspect
 
     # Create a structure to store instances of any singletons that get
     # created.
@@ -11,46 +10,53 @@ def singleton(Class):
     # arguments.  Since singletons can only be instantiated once, it doesn't
     # make any sense for the constructor to take arguments.
     try:
-        specification = inspect.getargspec(Class.__init__)
+        specification = inspect.getargspec(cls.__init__)
         positional, variable, keyword, default = specification
         message = "Singleton classes cannot accept arguments to the constructor."
 
         # The constructor should have a self argument, but no others.
-        if len(positional) is not 1: raise TypeError(message)
-        if variable is not None or keyword is not None: raise TypeError(message)
+        if len(positional) is not 1:
+            raise TypeError(message)
+        if (variable is not None) or (keyword is not None):
+            raise TypeError(message)
 
     # If the class doesn't have a constructor, that's ok.
     except AttributeError:
         pass
 
-    # This function is what the decorator returns.  In turn, this function is
-    # responsible for creating and returning the singleton object.
     def get_instance():
+        """ Creates and returns the singleton object.  This function is what 
+        gets returned by this decorator. """
 
         # Check to see if an instance of this class has already been
         # instantiated.  If it hasn't, create one.  The `instances` structure
         # is technically a global variable, so it will be preserved between
         # calls to this function.
-        if Class not in instances:
-            instances[Class] = Class()
+        if cls not in instances:
+            instances[cls] = cls()
 
         # Return a previously instantiated object of the requested type.
-        return instances[Class]
+        return instances[cls]
 
     # Return the decorator function.
     return get_instance
+
 
 if __name__ == "__main__":
 
     # This is the simplest possible singleton class, and it should work
     # without issue.
+    
     @singleton
-    class Simple: pass
+    class Simple:
+        pass
+
 
     assert Simple() is Simple()
 
     # This should fail, because singleton constructors are not allowed to take
     # any arguments.
+
     try:
         @singleton
         class Broken:

@@ -2,8 +2,12 @@
 
 import re
 
-
 def wrap(*lines, **options):
+    """ Combines the lines given in the list argument into a single string 
+    wrapped to fit inside an 80-character (by default) display.  Both the 
+    indentation and the terminal width can be controlled using keyword 
+    arguments. """
+
     indent = options.get("indent", 0) * ' '
     columns = options.get("columns", 79)
 

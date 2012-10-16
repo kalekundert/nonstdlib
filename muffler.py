@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
+# This module defines a class which can be used to temporarily suppress stdout 
+# and stderr, using the natural 'with-statement' syntax.  Anything written to 
+# either file descriptor while it is being muffled can be accessed as a string.
+
 import sys
 
 class Muffler(object):
 
-    # Dummy File {{{1
     class File:
 
         def __init__(self):
@@ -16,29 +19,25 @@ class Muffler(object):
         def write(self, string):
             self.string += string
 
-    # }}}1
 
-    # Constructor {{{1
     def __init__(self, **files):
         self.stdout = sys.stdout
         self.stderr = sys.stderr
 
         self.files = {
-                "stdout" : files["stdout"] if "stdout" in files else True,
-                "stderr" : files["stderr"] if "stderr" in files else True }
+                'stdout' : files['stdout'] if 'stdout' in files else True,
+                'stderr' : files['stderr'] if 'stderr' in files else True }
 
         self.file = Muffler.File()
 
-    # String Operator {{{1
     def __str__(self):
         return str(self.file)
 
-    # "With" Operators {{{1
     def __enter__(self):
-        if self.files["stdout"]:
+        if self.files['stdout']:
             sys.stdout = self.file
             
-        if self.files["stderr"]:
+        if self.files['stderr']:
             sys.stderr = self.file
 
         return self
@@ -47,9 +46,8 @@ class Muffler(object):
         sys.stdout = self.stdout
         sys.stderr = self.stderr
 
-    # }}}1
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     muffler = Muffler()
     greeting = "Hello world!"

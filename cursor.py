@@ -1,6 +1,8 @@
 import sys
 
-# For more information, search for "VT100 terminal codes".
+# This module provides some tools for manipulating the position of the cursor.  
+# This is useful for programs that need to update some simple pieces of 
+# information (like a clock) but don't require a full-blown ncurses interface.
 
 colors = {
     'normal'        : 0,
