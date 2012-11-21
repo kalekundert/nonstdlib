@@ -25,14 +25,14 @@ def write(string):
     sys.stdout.write(string)
     sys.stdout.flush()
 
-def write_color(string, name, style="normal"):
+def write_color(string, name, style='normal'):
     """ Write a colored string to standard out. """
     write(color(string, name, style))
 
-def color(string, name, style="normal"):
+def color(string, name, style='normal'):
     """ Change the color of the given string. """
     prefix = '\033[%d;%dm' % (styles[style], colors[name])
-    suffix = '\033[%d;%dm' % (styles["normal"], colors["normal"])
+    suffix = '\033[%d;%dm' % (styles['normal'], colors['normal'])
     return prefix + string + suffix
 
 def move(x, y):
