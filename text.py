@@ -28,6 +28,11 @@ def wrap(*lines, **options):
 
     return '\n'.join(lines)
 
+def plural(count, singular, plural=None):
+    if plural is None: plural = singular + 's'
+    return singular if count == 1 else plural
+
+
 if __name__ == "__main__":
 
     print wrap(
