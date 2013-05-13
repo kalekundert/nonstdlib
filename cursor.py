@@ -21,13 +21,31 @@ styles = {
     'reverse'       : 2 }
 
 def write(string):
-    """ Write string to standard out. """
+    """ Write the given string to standard out. """
     sys.stdout.write(string)
     sys.stdout.flush()
 
 def write_color(string, name, style='normal'):
-    """ Write a colored string to standard out. """
+    """ Write the given colored string to standard out. """
     write(color(string, name, style))
+
+def update(string):
+    """ Replace the existing line with the given string. """
+    clear()
+    write(string)
+    
+def update_color(string, name, style='normal'):
+    """ Replace the existing line with the given colored string. """
+    clear()
+    write(string)
+
+def progress(current, total):
+    """ Display a simple progress report. """
+    update('[%d/%d] ' % (current, total))
+
+def progress_color(current, total, name, style='normal'):
+    """ Display a simple, colored progress report. """
+    update_color('[%d/%d] ' % (current, total), name, style)
 
 def color(string, name, style='normal'):
     """ Change the color of the given string. """
@@ -78,3 +96,42 @@ def conceal():
 def reveal():
     """ Reveal the cursor. """
     write('\033[?25h')
+
+def terminal_width():
+    """ Return the width of the terminal. """
+    return terminal_size()[0]
+
+def terminal_height():
+    """ Return the height of the terminal. """
+    return terminal_size()[1]
+
+def terminal_size():
+    """ Return the size of the terminal as a (width, height) tuple. """
+    import os
+    env = os.environ
+
+    def ioctl_GWINSZ(fd):
+        try:
+            import fcntl, termios, struct, os
+            cr = struct.unpack(
+                    'hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
+        except:
+            return
+        return cr
+
+
+    cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)
+
+    if not cr:
+        try:
+            fd = os.open(os.ctermid(), os.O_RDONLY)
+            cr = ioctl_GWINSZ(fd)
+            os.close(fd)
+        except:
+            pass
+
+    if not cr:
+        cr = env.get('LINES', 25), env.get('COLUMNS', 80)
+
+    return int(cr[1]), int(cr[0])
+
