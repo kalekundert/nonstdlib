@@ -1,3 +1,7 @@
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 def singleton(cls):
     """ Decorator function that turns a class into a singleton. """
     import inspect
@@ -12,17 +16,19 @@ def singleton(cls):
     try:
         specification = inspect.getargspec(cls.__init__)
         positional, variable, keyword, default = specification
+
+    # If the class doesn't have a constructor, that's ok.
+    except TypeError:
+        pass
+
+    # Otherwise, make sure the constructor has only a self argument.
+    else:
         message = "Singleton classes cannot accept arguments to the constructor."
 
-        # The constructor should have a self argument, but no others.
         if len(positional) is not 1:
             raise TypeError(message)
         if (variable is not None) or (keyword is not None):
             raise TypeError(message)
-
-    # If the class doesn't have a constructor, that's ok.
-    except AttributeError:
-        pass
 
     def get_instance():
         """ Creates and returns the singleton object.  This function is what 
@@ -68,5 +74,6 @@ if __name__ == "__main__":
     else:
         raise AssertionError
 
+    print("All tests passed.")
 
 

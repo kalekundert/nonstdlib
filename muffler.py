@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 # This module defines a class which can be used to temporarily suppress stdout 
 # and stderr, using the natural 'with-statement' syntax.  Anything written to 
 # either file descriptor while it is being muffled can be accessed as a string.
@@ -18,6 +22,9 @@ class Muffler(object):
 
         def write(self, string):
             self.string += string
+
+        def flush(self):
+            pass
 
 
     def __init__(self, **files):
@@ -53,8 +60,8 @@ if __name__ == '__main__':
     greeting = "Hello world!"
 
     with muffler:
-        print greeting
+        print(greeting)
 
     assert str(muffler) == greeting + '\n'
-    print "All tests passed!"
+    print("All tests passed!")
 

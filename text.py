@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import re
 
 def wrap(*lines, **options):
@@ -8,8 +12,8 @@ def wrap(*lines, **options):
     indentation and the terminal width can be controlled using keyword 
     arguments. """
 
-    indent = options.get("indent", 0) * ' '
-    columns = options.get("columns", 79)
+    indent = options.get('indent', 0) * ' '
+    columns = options.get('columns', 79)
 
     input = ''.join(lines)
     words = re.split('( )+', input)
@@ -32,10 +36,13 @@ def plural(count, singular, plural=None):
     if plural is None: plural = singular + 's'
     return singular if count == 1 else plural
 
+def indent(string, indent='  '):
+    return indent + string.replace('\n', '\n' + indent)
+
 
 if __name__ == "__main__":
 
-    print wrap(
+    print(wrap(
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ',
             'lobortis posuere rutrum. Nam eu aliquam dolor. Fusce eleifend ',
             'facilisis nisi in blandit. Donec vitae turpis ipsum. In leo ',
@@ -51,4 +58,4 @@ if __name__ == "__main__":
             'ullamcorper arcu, quis scelerisque orci ornare nec. Donec ',
             'vitae urna ac arcu ultricies posuere. Morbi fermentum molestie ',
             'libero, eu ultricies orci placerat eget.', 
-            columns=40, indent=4)
+            columns=40, indent=4))

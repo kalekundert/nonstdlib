@@ -1,8 +1,12 @@
-import sys
-
 # This module provides some tools for manipulating the position of the cursor.  
 # This is useful for programs that need to update some simple pieces of 
 # information (like a clock) but don't require a full-blown ncurses interface.
+
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import sys
 
 colors = {
     'normal'        : 0,
@@ -134,4 +138,5 @@ def terminal_size():
         cr = env.get('LINES', 25), env.get('COLUMNS', 80)
 
     return int(cr[1]), int(cr[0])
+
 

@@ -1,11 +1,18 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 def reset_defaults(function):
+    import six
     from copy import deepcopy
-    defaults = function.func_defaults
+
+    defaults = six.get_function_defaults(function)
 
     def decorator(*args, **kwargs):
-        function.func_defaults = deepcopy(defaults)
+        if six.PY3: function.__defaults__ = deepcopy(defaults)
+        else: function.func_defaults = deepcopy(defaults)
         return function(*args, **kwargs)
 
 
@@ -19,7 +26,7 @@ if __name__ == '__main__':
     @reset_defaults
     def dont_increment(value, list=[]):
         list.append(value)
-        print list
+        print(list)
 
     dont_increment(1)
     dont_increment(2)
