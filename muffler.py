@@ -40,6 +40,9 @@ class Muffler(object):
     def __str__(self):
         return str(self.file)
 
+    def __contains__(self, string):
+        return string in str(self)
+
     def __enter__(self):
         if self.files['stdout']:
             sys.stdout = self.file

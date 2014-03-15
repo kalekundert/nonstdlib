@@ -118,7 +118,7 @@ def terminal_size():
         try:
             import fcntl, termios, struct, os
             cr = struct.unpack(
-                    'hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
+                    b'hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
         except:
             return
         return cr
