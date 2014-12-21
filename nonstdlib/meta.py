@@ -1,6 +1,41 @@
+#!/usr/bin/env python
+
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
+
+def memoize(function):
+    previous_results = {}
+
+    def decorator(*args):
+        try:
+            return previous_results[args]
+        except KeyError:
+            previous_results[args] = function(*args)
+            return previous_results[args]
+
+
+    decorator.__name__ = function.__name__
+    decorator.__doc__ = function.__doc__
+
+    return decorator
+
+def reset_defaults(function):
+    import six
+    from copy import deepcopy
+
+    defaults = six.get_function_defaults(function)
+
+    def decorator(*args, **kwargs):
+        if six.PY3: function.__defaults__ = deepcopy(defaults)
+        else: function.func_defaults = deepcopy(defaults)
+        return function(*args, **kwargs)
+
+
+    decorator.__name__ = function.__name__
+    decorator.__doc__ = function.__doc__
+
+    return decorator
 
 def singleton(cls):
     """ Decorator function that turns a class into a singleton. """
@@ -48,7 +83,34 @@ def singleton(cls):
     return get_instance
 
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
+
+    # Test memoize()
+
+    @memoize
+    def slow_func(i):
+        import time
+        time.sleep(i)
+        return i
+
+    
+    for i in range(100):
+        assert slow_func(1) == 1
+
+    # Test reset_defaults()
+
+    @reset_defaults
+    def dont_increment(value, list=[]):
+        list.append(value)
+        return list
+
+
+    assert dont_increment(1) == [1]
+    assert dont_increment(2) == [2]
+    assert dont_increment(3, [1, 2]) == [1, 2, 3]
+
+    # Test singleton()
 
     # This is the simplest possible singleton class, and it should work
     # without issue.
@@ -74,6 +136,8 @@ if __name__ == "__main__":
     else:
         raise AssertionError
 
-    print("All tests passed.")
+    print("All tests passed!")
+
+
 
 
