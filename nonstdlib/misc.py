@@ -68,3 +68,19 @@ def is_iterable(obj):
     except: return False
     return isinstance(obj, basestring)
 
+def weighted_choice(choices, weights):
+    total = sum(w for w in weights)
+    threshold = random.uniform(0, total)
+    weight_sum = 0
+
+    for choice, weight in zip(choices, weights):
+        weight_sum += weight
+        if weight_sum > threshold:
+            return choice
+
+    # Barring some sort of floating point error, we should never get this far.  
+    # But if we do, returning the last choice is clearly the right action.
+
+    return choices[-1]
+
+

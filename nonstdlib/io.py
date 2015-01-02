@@ -79,6 +79,13 @@ class Muffler(object):
 
 
 
+def printf(string, *args, **kwargs):
+    print(string.format(*args, **kwargs))
+
+def echo(*args, **kwargs):
+    print(args, kwargs or '')
+
+
 def write(string):
     """ Write the given string to standard out. """
     sys.stdout.write(string)
@@ -140,19 +147,19 @@ def clear_eol():
     """ Clear the screen to end of line. """
     write('\033[0K')
 
-def save():
+def save_cursor():
     """ Save the cursor position. """
     write('\033[s')
 
-def restore():
+def restore_cursor():
     """ Restore the cursor position. """
     write('\033[u')
 
-def conceal():
+def conceal_cursor():
     """ Conceal the cursor. """
     write('\033[?25l')
 
-def reveal():
+def reveal_cursor():
     """ Reveal the cursor. """
     write('\033[?25h')
 
