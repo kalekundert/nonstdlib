@@ -13,7 +13,10 @@ import inspect
 def mark(message=""):
     frame = inspect.stack()[1][0]
     info = inspect.getframeinfo(frame)
-    print(info.filename, info.function, info.lineno, message)
+    loc = 'File "{0.filename}", line {0.lineno}, in {0.function}'.format(info)
+    if message: print(loc + ': ' + message)
+    else: print(loc)
+
 
 if __name__ == '__main__':
 
@@ -23,3 +26,9 @@ if __name__ == '__main__':
         mark("Hello world")
 
     foo()
+
+    class Bar:
+        def __init__(self):
+            mark("Hello world")
+
+    Bar()
