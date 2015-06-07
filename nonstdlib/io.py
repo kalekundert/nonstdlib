@@ -13,6 +13,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import sys
+import contextlib
 
 colors = {
     'normal'        : 0,
@@ -31,69 +32,74 @@ styles = {
     'reverse'       : 2 }
 
 
-class Muffler(object):
-
-    class File:
-
-        def __init__(self):
-            self.string = ""
-
-        def __str__(self):
-            return self.string
-
-        def write(self, string):
-            self.string += string
-
-        def flush(self):
-            pass
-
-
-    def __init__(self, **files):
-        self.stdout = sys.stdout
-        self.stderr = sys.stderr
-
-        self.files = {
-                'stdout' : files['stdout'] if 'stdout' in files else True,
-                'stderr' : files['stderr'] if 'stderr' in files else True }
-
-        self.file = Muffler.File()
-
-    def __str__(self):
-        return str(self.file)
-
-    def __contains__(self, string):
-        return string in str(self)
-
-    def __enter__(self):
-        if self.files['stdout']:
-            sys.stdout = self.file
-            
-        if self.files['stderr']:
-            sys.stderr = self.file
-
-        return self
-
-    def __exit__(self, *ignore):
-        sys.stdout = self.stdout
-        sys.stderr = self.stderr
-
-
-
 def printf(string, *args, **kwargs):
     print(string.format(*args, **kwargs))
 
 def echo(*args, **kwargs):
     print(args, kwargs or '')
 
+@contextlib.contextmanager
+def capture_output(stdout=True, stderr=True, muffle=False):
+
+    class CapturedOutput:
+
+        def __init__(self):
+            self.stdout = ""
+            self.stderr = ""
+
+        def __contains__(self, phrase):
+            return (phrase in self.stdout) or (phrase in self.stderr)
+
+    class CapturedStream:
+
+        def __init__(self, stream, write_callback):
+            self.stream = stream
+            self.write_callback = write_callback
+
+        def write(self, string):
+            if not muffle: self.stream.write(string)
+            self.write_callback(string)
+
+        def flush(self):
+            self.stream.flush()
+
+
+    captured_output = CapturedOutput()
+
+    def write_to_stdout(message):
+        captured_output.stdout += message
+
+    def write_to_stderr(message):
+        captured_output.stderr += message
+
+
+    try:
+        if stdout: sys.stdout = CapturedStream(sys.stdout, write_to_stdout)
+        if stderr: sys.stderr = CapturedStream(sys.stderr, write_to_stderr)
+        yield captured_output
+
+    finally:
+        if stdout: sys.stdout = sys.stdout.stream
+        if stderr: sys.stderr = sys.stderr.stream
+
+@contextlib.contextmanager
+def muffle(stdout=True, stderr=True):
+    with capture_output(stdout, stderr, muffle=True):
+        yield
+
 
 def write(string):
     """ Write the given string to standard out. """
     sys.stdout.write(string)
-    sys.stdout.flush()
+    if sys.stdout.isatty():
+        sys.stdout.flush()
 
-def write_color(string, name, style='normal'):
+def write_color(string, name, style='normal', when='auto'):
     """ Write the given colored string to standard out. """
-    write(color(string, name, style))
+    if when == 'always' or (when == 'auto' and sys.stdout.isatty()):
+        write(color(string, name, style))
+    else:
+        write(string)
 
 def update(string):
     """ Replace the existing line with the given string. """
@@ -208,7 +214,7 @@ if __name__ == '__main__':
     greeting = "Hello world!"
 
     with muffler:
-        print(greeting)
+        print(greeting, file=sys.stderr)
 
     assert str(muffler) == greeting + '\n'
     print("All tests passed!")
