@@ -10,6 +10,7 @@ distutils.core.setup(
         name='nonstdlib',
         version=version,
         author='Kale Kundert',
+        author='kale@thekunderts.net',
         url='https://github.com/kalekundert/nonstdlib',
         download_url='https://github.com/kalekundert/nonstdlib/tarball/'+version,
         license='MIT',
