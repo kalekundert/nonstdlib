@@ -2,7 +2,11 @@ import distutils.core
 
 # Uploading to PyPI
 # =================
+# The first time only:
 # $ python setup.py register -r pypi
+#
+# Every version bump:
+# $ git tag <version>; git push
 # $ python setup.py sdist upload -r pypi
 
 version = '1.0'
