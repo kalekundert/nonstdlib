@@ -13,6 +13,7 @@ import subprocess, shlex
 # $ python setup.py sdist upload -r pypi
 
 version = subprocess.check_output(shlex.split('git tag --contains HEAD'))
+version = version.decode().split()[0].strip()
 if not version:
     print("No version found.  Did you forget to tag the current commit?")
     raise SystemExit
