@@ -1,4 +1,7 @@
+#!/usr/bin/env python3
+
 import distutils.core
+import subprocess, shlex
 
 # Uploading to PyPI
 # =================
@@ -9,12 +12,16 @@ import distutils.core
 # $ git tag <version>; git push
 # $ python setup.py sdist upload -r pypi
 
-version = '1.0'
+version = subprocess.check_output(shlex.split('git tag --contains HEAD'))
+if not version:
+    print("No version found.  Did you forget to tag the current commit?")
+    raise SystemExit
+
 distutils.core.setup(
         name='nonstdlib',
         version=version,
         author='Kale Kundert',
-        author='kale@thekunderts.net',
+        author_email='kale@thekunderts.net',
         url='https://github.com/kalekundert/nonstdlib',
         download_url='https://github.com/kalekundert/nonstdlib/tarball/'+version,
         license='MIT',
