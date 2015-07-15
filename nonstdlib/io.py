@@ -96,34 +96,40 @@ def write(string):
 
 def write_color(string, name, style='normal', when='auto'):
     """ Write the given colored string to standard out. """
-    if when == 'always' or (when == 'auto' and sys.stdout.isatty()):
-        write(color(string, name, style))
-    else:
-        write(string)
+    write(color(string, name, style, when))
 
 def update(string):
     """ Replace the existing line with the given string. """
     clear()
     write(string)
     
-def update_color(string, name, style='normal'):
+def update_color(string, name, style='normal', when='auto'):
     """ Replace the existing line with the given colored string. """
     clear()
-    write(string)
+    write_color(string, name, style, when)
 
 def progress(current, total):
     """ Display a simple progress report. """
     update('[%d/%d] ' % (current, total))
 
-def progress_color(current, total, name, style='normal'):
+def progress_color(current, total, name, style='normal', when='auto'):
     """ Display a simple, colored progress report. """
-    update_color('[%d/%d] ' % (current, total), name, style)
+    update_color('[%d/%d] ' % (current, total), name, style, when)
 
-def color(string, name, style='normal'):
+def color(string, name, style='normal', when='auto'):
     """ Change the color of the given string. """
     prefix = '\033[%d;%dm' % (styles[style], colors[name])
     suffix = '\033[%d;%dm' % (styles['normal'], colors['normal'])
-    return prefix + string + suffix
+    color_string = prefix + string + suffix
+
+    if when == 'always':
+        return color_string
+    elif when == 'auto':
+        return color_string if sys.stdout.isatty() else string
+    elif when == 'never':
+        return string
+    else:
+        raise ValueError("when must be one of: 'always', 'auto', 'never'")
 
 def move(x, y):
     """ Move cursor to the given coordinates. """
