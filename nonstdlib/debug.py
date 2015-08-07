@@ -4,6 +4,52 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import logging
+
+def log_level(level):
+    """
+    Attempt to convert the given argument into a log level.
+
+    Log levels are represented as integers, where higher values are more 
+    severe.  If the given level is already an integer, it is simply returned.  
+    If the given level is a string that can be converted into an integer, it is 
+    converted and that value is returned.  Finally, if the given level is a 
+    string and there is a variable of the same name in the logging namespace, 
+    the value of that variable is returned.
+    """
+    from six import string_types
+
+    if isinstance(level, int):
+        return level
+
+    if isinstance(level, string_types):
+        try: return int(level)
+        except ValueError: pass
+
+        try: return getattr(logging, level.upper())
+        except AttributeError: pass
+
+    raise ValueError("cannot convert '{}' into a log level".format(level))
+
+def verbosity(verbosity):
+    """
+    Convert the number of times the user specified '-v' on the command-line 
+    into a log level.
+    """
+    verbosity = int(verbosity)
+
+    if verbosity == 0:
+        return logging.WARNING
+    if verbosity == 1:
+        return logging.INFO
+    if verbosity == 2:
+        return logging.DEBUG
+    if verbosity >= 3:
+        return 0
+    else:
+        raise ValueError
+
+
 def log(level, message, **kwargs):
     _log(level, message, **kwargs)
 
@@ -29,7 +75,7 @@ def _log(level, message, frame_depth=2, **kwargs):
     from within another function, because it is hard-coded to use a frame depth 
     of 2 to pick a name.
     """
-    import inspect, logging
+    import inspect
 
     try:
         # Inspect variables two frames where we currently are (by default).  
@@ -69,16 +115,19 @@ def _log(level, message, frame_depth=2, **kwargs):
 
 
 if __name__ == '__main__':
-    import logging
-
     logging.basicConfig(
             format='%(levelname)s: %(name)s: %(message)s',
-            level=logging.DEBUG,
+            level=0,
     )
+
+    # Make sure log_level() works.
+
+    log(log_level(1), "Variable level")
+    log(log_level("99"), "Variable level")
+    log(log_level("info"), "Variable level")
 
     # Make sure there aren't any stupid typos in the public interface.
 
-    log(logging.INFO, "Variable level")
     info("Info level")
     debug("Debug level")
     warning("Warning level")
