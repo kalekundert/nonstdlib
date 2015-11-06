@@ -60,6 +60,9 @@ def debug(message, **kwargs):
 def info(message, **kwargs):
     _log(logging.INFO, message, **kwargs)
 
+def warn(message, **kwargs):
+    return _log(logging.WARNING, message, **kwargs)
+
 def warning(message, **kwargs):
     _log(logging.WARNING, message, **kwargs)
 
