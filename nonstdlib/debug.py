@@ -5,6 +5,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import logging
+import sys
 
 def log_level(level):
     """
@@ -114,11 +115,58 @@ def _log(level, message, frame_depth=2, **kwargs):
     logging.getLogger(name).log(level, message.format(**scope), **kwargs)
 
 
+def config(stream=sys.stderr,
+           level=logging.NOTSET,
+           format='%(levelname)s [%(name)s:%(lineno)s] %(message)s',
+           file=None,
+           file_level=None,
+           file_format=None):
+    """ Configure logging to stream and file concurrently.
+    Allows setting a file and stream to log to concurrently with differing level if desired.
+    Must provide either stream or file.
+
+    Args:
+        stream (File like): Stream to write file to [Default: sys.stderr]. If none, will not write to stream.
+        level (str|int): Log level. Allowable levels are those recognized by logging.
+        format (str): Format string for the emitted logs. [Default: 'log_level [logger_name] message']
+        file (str): Path to write log to file. If none, will not log to file (Default).
+        file_level (str|int|None): Overwrite log level for the file. Will default to `level` if None (Default).
+        file_format (str|None): Overwrite format of logs for file. Will default to `format` if None (Default).
+    """
+    # It doesn't make sense to configure a logger with no handlers.
+    assert file is not None or stream is not None
+
+    # Set the formats.
+    stream_format = format
+    if file_format is None:
+        file_format = stream_format
+
+    # Get the log levels
+    stream_level = log_level(level)
+    if file_level is None:
+        file_level = stream_level
+    else:
+        file_level = log_level(file_level)
+
+    # Everything falls to pieces if I don't use basicConfig.
+    if stream is not None:
+        logging.basicConfig(stream=stream,
+                            level=stream_level,
+                            format=stream_format)
+        # Configure file
+        if file is not None:
+            file = logging.FileHandler(filename=file)
+            file.setLevel(file_level)
+            file.setFormatter(logging.Formatter(file_format))
+            logging.getLogger().addHandler(file)
+    elif file is not None:
+        logging.basicConfig(filename=file,
+                            level=file_level,
+                            format=file_format)
+
+
 if __name__ == '__main__':
-    logging.basicConfig(
-            format='%(levelname)s: %(name)s: %(message)s',
-            level=0,
-    )
+    config()
 
     # Make sure log_level() works.
 
