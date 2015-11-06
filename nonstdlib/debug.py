@@ -103,7 +103,7 @@ def _log(level, message, frame_depth=2, **kwargs):
 
         name = frame.f_globals['__name__']
         self = frame.f_locals.get('self')
-        function = inspect.getframeinfo(frame).function
+        filename, lineno, function, _, _ = inspect.getframeinfo(frame)
 
         if self is not None:
             name += '.' + self.__class__.__name__
