@@ -146,38 +146,3 @@ def _temporarily_set_logging_frame(frame):
         logging.currentframe = stdlib_currentframe
 
 
-if __name__ == '__main__':
-    logging.basicConfig(
-            format='%(levelname)s: %(name)s: %(lineno)s: %(message)s',
-            level=0,
-    )
-
-    # Make sure log_level() works.
-
-    log(log_level(1), "Variable level")
-    log(log_level("99"), "Variable level")
-    log(log_level("info"), "Variable level")
-
-    # Make sure there aren't any stupid typos in the public interface.
-
-    info("Info level")
-    debug("Debug level")
-    warning("Warning level")
-    error("Error level")
-    critical("Critical error")
-
-    # Make sure different scopes are properly incorporated into the output.
-
-    info("Module level")
-
-    def foo():  # (no fold)
-        info("Function level")
-
-    foo()
-
-    class Bar:  # (no fold)
-        def __init__(self):
-            info("Method level")
-
-    Bar()
-
