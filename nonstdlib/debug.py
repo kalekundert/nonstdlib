@@ -57,17 +57,33 @@ def config(stream=sys.stderr,
            file=None,
            file_level=None,
            file_format=None):
-    """ Configure logging to stream and file concurrently.
-    Allows setting a file and stream to log to concurrently with differing level if desired.
-    Must provide either stream or file.
+    """
+    Configure logging to stream and file concurrently.
 
-    Args:
-        stream (File like): Stream to write file to [Default: sys.stderr]. If none, will not write to stream.
-        level (str|int): Log level. Allowable levels are those recognized by logging.
-        format (str): Format string for the emitted logs. [Default: 'log_level [logger_name] message']
-        file (str): Path to write log to file. If none, will not log to file (Default).
-        file_level (str|int|None): Overwrite log level for the file. Will default to `level` if None (Default).
-        file_format (str|None): Overwrite format of logs for file. Will default to `format` if None (Default).
+    Allows setting a file and stream to log to concurrently with differing 
+    level if desired.  Must provide either stream or file.
+
+    Parameters
+    ----------
+    stream: File like:
+        Stream to write file to [Default: sys.stderr]. If none, will not write 
+        to stream.
+
+    level: str|int
+        Log level. Allowable levels are those recognized by the logging module.
+
+    format: str
+        Format string for the emitted logs. Default: 'log_level [logger_name] 
+        message'
+
+    file: str
+        Path to write log to file. If None, will not log to file.
+
+    file_level: str|int|None
+        Overwrite log level for the file. Will default to `level` if None.
+
+    file_format: str|None
+        Overwrite format of logs for file. Will default to `format` if None.
     """
     # It doesn't make sense to configure a logger with no handlers.
     assert file is not None or stream is not None
