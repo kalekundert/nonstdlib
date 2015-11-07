@@ -5,6 +5,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import logging
+import contextlib
 
 def log_level(level):
     """
@@ -14,8 +15,8 @@ def log_level(level):
     severe.  If the given level is already an integer, it is simply returned.  
     If the given level is a string that can be converted into an integer, it is 
     converted and that value is returned.  Finally, if the given level is a 
-    string and there is a variable of the same name in the logging namespace, 
-    the value of that variable is returned.
+    string naming one of the levels defined in the logging module, return that 
+    level.  If none of those conditions are met, raise a ValueError.
     """
     from six import string_types
 
@@ -68,22 +69,29 @@ def error(message, **kwargs):
 def critical(message, **kwargs):
     _log(logging.CRITICAL, message, **kwargs)
 
+def fatal(message, **kwargs):
+    _log(logging.FATAL, message, **kwargs)
+
 
 def _log(level, message, frame_depth=2, **kwargs):
     """
-    Log the given message to the given level.  This function must be called 
-    from within another function, because it is hard-coded to use a frame depth 
-    of 2 to pick a name.
+    Log the given message with the given log level using a logger named based 
+    on the scope of the calling code.  This saves you time because you will be 
+    able to see where all your log messages are being generated from without 
+    having to type anything.  This function is meant to be called by one or 
+    more wrapper functions, so the `frame_depth` argument is provided to 
+    specify which scope should be used to name the logger.
     """
     import inspect
 
     try:
-        # Inspect variables two frames where we currently are (by default).  
-        # One frame up is assumed to be one of the helper methods defined in 
-        # this module, so we aren't interested in that.  Two frames up should 
-        # be the frame that's actually trying to log something.
+        # Inspect variables two frames up from where we currently are (by 
+        # default).  One frame up is assumed to be one of the helper methods 
+        # defined in this module, so we aren't interested in that.  Two frames 
+        # up should be the frame that's actually trying to log something.
 
         frame = inspect.stack()[frame_depth][0]
+        frame_below = inspect.stack()[frame_depth-1][0]
         
         # Collect all the variables in the scope of the calling code, so they 
         # can be substituted into the message.
@@ -92,31 +100,55 @@ def _log(level, message, frame_depth=2, **kwargs):
         scope.update(frame.f_globals)
         scope.update(frame.f_locals)
 
-        # If the calling frame is inside a class (deduced based on the presense 
+        # If the calling frame is inside a class (deduced based on the presence 
         # of a 'self' variable), name the logger after that class.  Otherwise 
         # if the calling frame is inside a function, name the logger after that 
-        # function.
+        # function.  Otherwise name it after the module of the calling scope.
 
-        name = frame.f_globals['__name__']
         self = frame.f_locals.get('self')
         function = inspect.getframeinfo(frame).function
+        module = frame.f_globals['__name__']
 
         if self is not None:
-            name += '.' + self.__class__.__name__
+            name = '.'.join([
+                    self.__class__.__module__,
+                    self.__class__.__name__
+            ])
 
         elif function != '<module>':
-            name += '.' + function
+            name = '.'.join([module, function])
+
+        else:
+            name = module
+
+        # Trick the logging module into reading file names and line numbers 
+        # from the correct frame by monkey-patching logging.currentframe() with 
+        # a function that returns the frame below the real calling frame (this 
+        # indirection is necessary because the logging module will look one 
+        # frame above whatever this function returns).  Undo all this after 
+        # logging our message, to avoid interfering with other loggers.
+
+        with _temporarily_set_logging_frame(frame_below):
+            logger = logging.getLogger(name)
+            logger.log(level, message.format(**scope), **kwargs)
 
     finally:
         try: del frame
         except UnboundLocalError: pass
 
-    logging.getLogger(name).log(level, message.format(**scope), **kwargs)
+@contextlib.contextmanager
+def _temporarily_set_logging_frame(frame):
+    try:
+        stdlib_currentframe = logging.currentframe
+        logging.currentframe = lambda: frame
+        yield
+    finally:
+        logging.currentframe = stdlib_currentframe
 
 
 if __name__ == '__main__':
     logging.basicConfig(
-            format='%(levelname)s: %(name)s: %(message)s',
+            format='%(levelname)s: %(name)s: %(lineno)s: %(message)s',
             level=0,
     )
 
@@ -140,7 +172,6 @@ if __name__ == '__main__':
 
     def foo():  # (no fold)
         info("Function level")
-        pass
 
     foo()
 
