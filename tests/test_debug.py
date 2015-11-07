@@ -32,6 +32,7 @@ root.addHandler(handler)
 debug("Debug level")
 info("Info level")
 warning("Warning level")
+warn("Warning level")
 error("Error level")
 critical("Critical error")
 fatal("Fatal error")
@@ -65,40 +66,44 @@ def test_public_interface():
     assert handler[2].levelname == 'WARNING'
     assert handler[2].msg == "Warning level"
     
-    assert handler[3].levelno == 40
-    assert handler[3].levelname == 'ERROR'
-    assert handler[3].msg == "Error level"
+    assert handler[3].levelno == 30
+    assert handler[3].levelname == 'WARNING'
+    assert handler[3].msg == "Warning level"
     
-    assert handler[4].levelno == 50
-    assert handler[4].levelname == 'CRITICAL'
-    assert handler[4].msg == "Critical error"
+    assert handler[4].levelno == 40
+    assert handler[4].levelname == 'ERROR'
+    assert handler[4].msg == "Error level"
     
     assert handler[5].levelno == 50
     assert handler[5].levelname == 'CRITICAL'
-    assert handler[5].msg == "Fatal error"
+    assert handler[5].msg == "Critical error"
+    
+    assert handler[6].levelno == 50
+    assert handler[6].levelname == 'CRITICAL'
+    assert handler[6].msg == "Fatal error"
     
 def test_logger_names():
-    assert handler[6].name == 'test_debug'
-    assert handler[6].msg == "Module level"
+    assert handler[7].name == 'test_debug'
+    assert handler[7].msg == "Module level"
 
-    assert handler[7].name == 'test_debug.foo'
-    assert handler[7].msg == "Function level"
+    assert handler[8].name == 'test_debug.foo'
+    assert handler[8].msg == "Function level"
 
-    assert handler[8].name == 'test_debug.Bar'
-    assert handler[8].msg == "Method level"
+    assert handler[9].name == 'test_debug.Bar'
+    assert handler[9].msg == "Method level"
 
 def test_logger_scopes():
-    assert handler[6].pathname == __file__
-    assert handler[6].lineno == 41
-    assert handler[6].funcName == '<module>'
-    
     assert handler[7].pathname == __file__
-    assert handler[7].lineno == 44
-    assert handler[7].funcName == 'foo'
+    assert handler[7].lineno == 42
+    assert handler[7].funcName == '<module>'
     
     assert handler[8].pathname == __file__
-    assert handler[8].lineno == 50
-    assert handler[8].funcName == '__init__'
+    assert handler[8].lineno == 45
+    assert handler[8].funcName == 'foo'
+    
+    assert handler[9].pathname == __file__
+    assert handler[9].lineno == 51
+    assert handler[9].funcName == '__init__'
     
 def test_log_level():
     assert log_level(1) == 1
