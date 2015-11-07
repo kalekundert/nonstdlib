@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/kalekundert/nonstdlib.svg?branch=master
+    :target: https://travis-ci.org/kalekundert/nonstdlib
+
 The Non-Standard Library
 ========================
 This package is basically my personal collection of utility functions.  They 
