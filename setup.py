@@ -12,7 +12,7 @@ import subprocess, shlex
 # $ git tag <version>; git push
 # $ python setup.py sdist upload -r pypi
 
-version = '1.2'
+version = '1.3'
 distutils.core.setup(
         name='nonstdlib',
         version=version,
