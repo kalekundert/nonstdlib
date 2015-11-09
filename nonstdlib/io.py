@@ -88,6 +88,9 @@ def muffle(stdout=True, stderr=True):
         yield
 
 
+def print_color(string, name, style='normal', when='auto'):
+    print(color(string, name, style, when))
+
 def write(string):
     """ Write the given string to standard out. """
     sys.stdout.write(string)
