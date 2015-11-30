@@ -39,6 +39,20 @@ def echo(*args, **kwargs):
     print(args, kwargs or '')
 
 @contextlib.contextmanager
+def swap_streams(stdout=None, stderr=None):
+    original_stdout = sys.stdout
+    original_stderr = sys.stderr
+
+    try:
+        if stdout: sys.stdout = stdout
+        if stderr: sys.stderr = stderr
+        yield
+
+    finally:
+        sys.stdout = original_stdout
+        sys.stderr = original_stderr
+
+@contextlib.contextmanager
 def capture_output(stdout=True, stderr=True, muffle=False):
 
     class CapturedOutput:
@@ -73,18 +87,42 @@ def capture_output(stdout=True, stderr=True, muffle=False):
         captured_output.stderr += message
 
 
-    try:
-        if stdout: sys.stdout = CapturedStream(sys.stdout, write_to_stdout)
-        if stderr: sys.stderr = CapturedStream(sys.stderr, write_to_stderr)
+    with swap_streams(
+            stdout=CapturedStream(sys.stdout, write_to_stdout),
+            stderr=CapturedStream(sys.stderr, write_to_stderr)):
         yield captured_output
-
-    finally:
-        if stdout: sys.stdout = sys.stdout.stream
-        if stderr: sys.stderr = sys.stderr.stream
 
 @contextlib.contextmanager
 def muffle(stdout=True, stderr=True):
     with capture_output(stdout, stderr, muffle=True):
+        yield
+
+@contextlib.contextmanager
+def keep_on_one_line():
+    """
+    Keep all the output generated within a with-block on one line.  Whenever a 
+    new line would be printed, instead reset the cursor to the beginning of the 
+    line and print the new line without a line break.
+    """
+
+    class CondensedStream:
+
+        def __init__(self):
+            self.sys_stdout = sys.stdout
+
+        def write(self, string):
+            with swap_streams(self.sys_stdout):
+                string = string.replace('\n', ' ')
+                string = truncate_to_fit_terminal(string)
+                if string.strip():
+                    update(string)
+
+        def flush(self):
+            with swap_streams(self.sys_stdout):
+                flush()
+
+
+    with swap_streams(CondensedStream()):
         yield
 
 
@@ -94,8 +132,7 @@ def print_color(string, name, style='normal', when='auto'):
 def write(string):
     """ Write the given string to standard out. """
     sys.stdout.write(string)
-    if sys.stdout.isatty():
-        sys.stdout.flush()
+    flush()
 
 def write_color(string, name, style='normal', when='auto'):
     """ Write the given colored string to standard out. """
@@ -133,6 +170,11 @@ def color(string, name, style='normal', when='auto'):
         return string
     else:
         raise ValueError("when must be one of: 'always', 'auto', 'never'")
+
+def flush():
+    """ Flush the stdout buffer to the terminal, if there is one. """
+    if sys.stdout.isatty():
+        sys.stdout.flush()
 
 def move(x, y):
     """ Move cursor to the given coordinates. """
@@ -216,15 +258,24 @@ def terminal_size():
 
     return int(cr[1]), int(cr[0])
 
+def truncate_to_fit_terminal(string):
+    width = terminal_width()
+    if len(string) < width:
+        return string
+    else:
+        return string[:width-4] + '...'
+
 
 if __name__ == '__main__':
+    import time
 
-    muffler = Muffler()
-    greeting = "Hello world!"
+    print('counting...')
 
-    with muffler:
-        print(greeting, file=sys.stderr)
+    with keep_on_one_line():
+        print('1');  time.sleep(0.5)
+        print('2');  time.sleep(0.5)
+        print('3');  time.sleep(0.5)
+        print('4');  time.sleep(0.5)
+        print('5');  time.sleep(0.5)
 
-    assert str(muffler) == greeting + '\n'
-    print("All tests passed!")
-
+    print('\n...done')
