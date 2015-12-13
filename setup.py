@@ -25,4 +25,8 @@ distutils.core.setup(
         long_description=open('README.rst').read(),
         keywords=['utilities', 'library'],
         packages=['nonstdlib'],
+        install_requires=[
+            'six',
+            'numpy',
+        ],
 )
