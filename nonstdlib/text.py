@@ -39,6 +39,20 @@ def plural(count, singular, plural=None):
 def indent(string, indent='  '):
     return indent + string.replace('\n', '\n' + indent)
 
+def oxford_comma(items, conj='and'):
+    if len(items) == 2:
+        return '{0[0]} {1} {0[1]}'.format(items, conj)
+
+    result = ''
+    for i, item in enumerate(items):
+        if i == len(items) - 1:
+            result += '{}'.format(item)
+        elif i == len(items) - 2:
+            result += '{}, {} '.format(item, conj)
+        else:
+            result += '{}, '.format(item)
+    return result
+
 
 if __name__ == "__main__":
 
