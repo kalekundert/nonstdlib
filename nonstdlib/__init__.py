@@ -2,6 +2,7 @@
 
 __version__ = '1.5.0'
 
+from .approx import *
 from .debug import *
 from .io import *
 from .meta import *
