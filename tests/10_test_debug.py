@@ -83,13 +83,13 @@ def test_public_interface():
     assert handler[6].msg == "Fatal error"
     
 def test_logger_names():
-    assert handler[7].name == 'test_debug'
+    assert handler[7].name == '10_test_debug'
     assert handler[7].msg == "Module level"
 
-    assert handler[8].name == 'test_debug.foo'
+    assert handler[8].name == '10_test_debug.foo'
     assert handler[8].msg == "Function level"
 
-    assert handler[9].name == 'test_debug.Bar'
+    assert handler[9].name == '10_test_debug.Bar'
     assert handler[9].msg == "Method level"
 
 def test_logger_scopes():
