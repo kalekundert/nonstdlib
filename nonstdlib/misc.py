@@ -13,10 +13,8 @@ import itertools
 infinity = inf = float("inf")
 
 def span(start, stop, steps=50):
-    from itertools import takewhile, count
-    predicate = lambda x: x <= stop
-    step = (stop - start) / steps
-    return takewhile(predicate, count(start, step))
+    step = (stop - start) / (steps - 1)
+    return (start + i * step for i in range(steps))
 
 def clamp(value, lowest, highest):
     if lowest > highest:
