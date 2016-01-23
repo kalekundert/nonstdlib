@@ -12,9 +12,11 @@ import itertools
 
 infinity = inf = float("inf")
 
-def span(start, stop, count=50):
-    from numpy import linspace
-    return list(linspace(start, stop, num=count))
+def span(start, stop, steps=50):
+    from itertools import takewhile, count
+    predicate = lambda x: x <= stop
+    step = (stop - start) / steps
+    return takewhile(predicate, count(start, step))
 
 def clamp(value, lowest, highest):
     if lowest > highest:

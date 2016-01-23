@@ -28,7 +28,6 @@ setup(
     include_package_data=True,
     install_requires=[
         'six',
-        'numpy',
     ],
     license='MIT',
     zip_safe=False,
