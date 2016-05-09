@@ -94,6 +94,16 @@ def capture_output(stdout=True, stderr=True, muffle=False):
         yield captured_output
 
 @contextlib.contextmanager
+def capture_stdout(muffle=False):
+    with capture_output(stdout=True, stderr=False, muffle=muffle) as output:
+        yield output.stdout
+
+@contextlib.contextmanager
+def capture_stderr(muffle=False):
+    with capture_output(stdout=False, stderr=True, muffle=muffle) as output:
+        yield output.stderr
+
+@contextlib.contextmanager
 def muffle(stdout=True, stderr=True):
     with capture_output(stdout, stderr, muffle=True):
         yield
