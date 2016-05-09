@@ -8,4 +8,5 @@ from .io import *
 from .fmt import *
 from .meta import *
 from .misc import *
+from .sci import *
 from .text import *
