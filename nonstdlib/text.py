@@ -53,6 +53,30 @@ def oxford_comma(items, conj='and'):
             result += '{}, '.format(item)
     return result
 
+def pretty_range(x):
+    blocks = []
+    current_seq = []
+
+    def make_blocks(seq):
+        if len(seq) == 0:
+            return []
+        elif len(seq) == 1:
+            return [str(seq[0])]
+        elif len(seq) == 2:
+            return [str(seq[0]), str(seq[1])]
+        else:
+            return ['{}-{}'.format(seq[0], seq[-1])]
+
+
+    for i in sorted(x):
+        if current_seq and i != current_seq[-1] + 1:
+            blocks += make_blocks(current_seq)
+            current_seq = []
+        current_seq.append(i)
+
+    blocks += make_blocks(current_seq)
+    return ','.join(blocks)
+
 
 if __name__ == "__main__":
 
