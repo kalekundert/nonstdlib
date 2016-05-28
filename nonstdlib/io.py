@@ -25,12 +25,13 @@ colors = {
     'blue'          : 34,
     'magenta'       : 35,
     'cyan'          : 36,
-    'white'         : 37 }
-
+    'white'         : 37,
+}
 styles = {
     'normal'        : 0,
     'bold'          : 1,
-    'reverse'       : 2 }
+    'reverse'       : 2,
+}
 
 
 def printf(string, *args, **kwargs):
