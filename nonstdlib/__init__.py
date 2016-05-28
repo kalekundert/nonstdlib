@@ -3,6 +3,7 @@
 __version__ = '1.8.0'
 
 from .approx import *
+from .cast import *
 from .debug import *
 from .io import *
 from .fmt import *
