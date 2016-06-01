@@ -47,10 +47,15 @@ def singleton(cls):
 
     # Make sure that the constructor for this class doesn't take any
     # arguments.  Since singletons can only be instantiated once, it doesn't
-    # make any sense for the constructor to take arguments.
-    argspec = inspect.getargspec(cls.__init__)
-    if len(argspec.args) != 1:
-        raise TypeError("Singleton classes cannot accept arguments to the constructor.")
+    # make any sense for the constructor to take arguments.  If the class 
+    # doesn't implement its own constructor, don't do anything.  This case is 
+    # considered specially because it causes a TypeError in python 3.3 but not 
+    # in python 3.4.
+    if cls.__init__ is not object.__init__:
+        argspec = inspect.getfullargspec(cls.__init__)
+        if len(argspec.args) != 1 or argspec.varargs or argspec.varkw:
+            raise TypeError("Singleton classes cannot accept arguments to the constructor.")
+
 
     def get_instance():
         """ Creates and returns the singleton object.  This function is what 

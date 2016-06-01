@@ -47,6 +47,18 @@ def test_singleton_ctor_args():
     with pytest.raises(TypeError):
         @singleton
         class Broken:
-            def __init__(self, illegal):
+            def __init__(self, arg):
+                pass
+
+    with pytest.raises(TypeError):
+        @singleton
+        class Broken:
+            def __init__(self, *args):
+                pass
+
+    with pytest.raises(TypeError):
+        @singleton
+        class Broken:
+            def __init__(self, **kwargs):
                 pass
 
