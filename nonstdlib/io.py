@@ -170,6 +170,16 @@ def progress_color(current, total, name, style='normal', when='auto'):
 
 def color(string, name, style='normal', when='auto'):
     """ Change the color of the given string. """
+    if name not in colors:
+        from .text import oxford_comma
+        raise ValueError("unknown color '{}'.\nknown colors are: {}".format(
+            name, oxford_comma(["'{}'".format(x) for x in sorted(colors)])))
+
+    if style not in styles:
+        from .text import oxford_comma
+        raise ValueError("unknown style '{}'.\nknown styles are: {}".format(
+            style, oxford_comma(["'{}'".format(x) for x in sorted(styles)])))
+
     prefix = '\033[%d;%dm' % (styles[style], colors[name])
     suffix = '\033[%d;%dm' % (styles['normal'], colors['normal'])
     color_string = prefix + string + suffix
