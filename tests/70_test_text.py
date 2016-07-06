@@ -41,3 +41,18 @@ def test_pretty_range():
     assert pretty_range([1,3,5,6]) == '1,3,5,6'
     assert pretty_range([1,3,5,6,7]) == '1,3,5-7'
     assert pretty_range([1,3,5,7]) == '1,3,5,7'
+
+def test_indices_from_str():
+    assert indices_from_str('') == []
+    assert indices_from_str('1') == [1]
+    assert indices_from_str('1,2') == [1,2]
+    assert indices_from_str('1-3') == [1,2,3]
+    assert indices_from_str('1,3') == [1,3]
+    assert indices_from_str('1-3,5') == [1,2,3,5]
+    assert indices_from_str('1-3,5,6') == [1,2,3,5,6]
+    assert indices_from_str('1-3,5-7') == [1,2,3,5,6,7]
+    assert indices_from_str('1-3,5,7') == [1,2,3,5,7]
+    assert indices_from_str('1,3,5') == [1,3,5]
+    assert indices_from_str('1,3,5,6') == [1,3,5,6]
+    assert indices_from_str('1,3,5-7') == [1,3,5,6,7]
+    assert indices_from_str('1,3,5,7') == [1,3,5,7]
