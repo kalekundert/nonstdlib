@@ -4,9 +4,36 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-def plural(count, singular, plural=None):
-    if plural is None: plural = singular + 's'
-    return singular if count == 1 else plural
+class plural:
+    """
+    The format string has three sections, separated by '/'.  The first section 
+    is always printed, the second (optional) section is printed if the number 
+    is singular, and the third section is printed if the number is plural.  Any 
+    '?' in the format string are replaced with the actual number.
+
+    >>> "{:? thing/s}".format(plural(1))
+    1 thing
+    >>> "{:? thing/s}".format(plural(2))
+    2 things
+
+    >>> "{:/a cactus/? cacti}".format(plural(1))
+    a cactus
+    >>> "{:/a cactus/? cacti}".format(plural(2))
+    2 cacti
+
+    From Veedrac on Stack Overflow: 
+    http://stackoverflow.com/questions/21872366/plural-string-formatting
+
+    """
+    def __init__(self, value):
+        self.value = value
+
+    def __format__(self, formatter):
+        formatter = formatter.replace("?", str(self.value))
+        always, _, suffixes = formatter.partition("/")
+        singular, _, plural = suffixes.rpartition("/")
+        return "{}{}".format(always, singular if self.value == 1 else plural)
+
 
 def oxford_comma(items, conj='and'):
     if len(items) == 2:
