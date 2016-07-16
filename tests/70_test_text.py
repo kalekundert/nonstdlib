@@ -3,13 +3,13 @@
 from nonstdlib import *
 
 def test_plural():
-    assert plural(0, 'apple') == 'apples'
-    assert plural(1, 'apple') == 'apple'
-    assert plural(2, 'apple') == 'apples'
+    assert '{:? apple/s}'.format(plural(0)) == '0 apples'
+    assert '{:? apple/s}'.format(plural(1)) == '1 apple'
+    assert '{:? apple/s}'.format(plural(2)) == '2 apples'
 
-    assert plural(0, 'tomato', 'tomatoes') == 'tomatoes'
-    assert plural(1, 'tomato', 'tomatoes') == 'tomato'
-    assert plural(2, 'tomato', 'tomatoes') == 'tomatoes'
+    assert '{:/a cactus/? cactii}'.format(plural(0)) == '0 cactii'
+    assert '{:/a cactus/? cactii}'.format(plural(1)) == 'a cactus'
+    assert '{:/a cactus/? cactii}'.format(plural(2)) == '2 cactii'
 
 def test_oxford_comma():
     assert oxford_comma([]) == ''
