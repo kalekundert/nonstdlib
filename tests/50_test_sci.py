@@ -63,6 +63,11 @@ def test_increasing_mantissa_precision():
     assert sci(123456789, 8) == '1.23456789×10⁸'
     assert sci(123456789, 9) == '1.234567890×10⁸'
 
+def test_different_bases():
+    assert sci(8**4, base=8) == '1.00×8⁴'
+    assert sci(8**4, base=4) == '1.00×4⁶'
+    assert sci(8**4, base=2) == '1.00×2¹²'
+
 def test_default_mantissa_precision():
     assert sci(123456789) == '1.23×10⁸'
 
