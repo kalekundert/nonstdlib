@@ -21,6 +21,9 @@ def clamp(value, lowest, highest):
         lowest, highest = highest, lowest
     return min(max(value, lowest), highest)
 
+def round_up(value, nearest=1):
+    return nearest * (value // nearest + 1)
+
 
 def partition_list(iterable, chunks):
     return list(yield_partitioned(iterable, chunks))
