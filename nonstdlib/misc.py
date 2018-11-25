@@ -4,6 +4,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import re
 import math
 import itertools
 
@@ -11,6 +12,7 @@ import itertools
 # just like '0' or 'None'.  But it isn't, so I have to define it here instead.
 
 infinity = inf = float("inf")
+nan = float("nan")
 
 def span(start, stop, steps=50):
     step = (stop - start) / (steps - 1)
@@ -86,4 +88,32 @@ def weighted_choice(choices, weights):
 
     return choices[-1]
 
+
+def slugify(title, remove_parenthetical=True, replace_ampersand=True):
+    from unicodedata import normalize
+
+    # Remove any parenthetical expressions, if requested.
+    if remove_parenthetical:
+        title = re.sub(r'\(.*\)|\[.*\]|\{.*\}', '', title)
+
+    # Spell out any ampersands, if requested.
+    if replace_ampersand:
+        title = re.sub(r'&', ' and ', title)
+
+    # Replace any whitespace with an underscore.
+    slug = re.sub(r'[\s_-]+', '_', title)
+
+    # Try to replace unicode characters with alphanumeric ASCII ones.
+    slug = normalize('NFKD', slug).encode('ascii', 'ignore').decode()
+
+    # Remove any remaining characters that aren't alphanumeric or underscore.
+    slug = ''.join(x for x in slug if x.isalnum() or x in '_')
+
+    # Remove extra underscores.
+    slug = '_'.join(x for x in slug.split('_') if x)
+
+    # Make everything lower case.
+    slug = slug.lower()
+
+    return slug
 
