@@ -63,7 +63,6 @@ def pretty_range(x):
         else:
             return ['{}-{}'.format(seq[0], seq[-1])]
 
-
     for i in sorted(x):
         if current_seq and i != current_seq[-1] + 1:
             blocks += make_blocks(current_seq)
@@ -73,11 +72,13 @@ def pretty_range(x):
     blocks += make_blocks(current_seq)
     return ','.join(blocks)
 
-def indices_from_str(x, start=0):
-    import re
+def indices_from_str(
+        x,
+        cast=int,
+        range=lambda a, b: range(a, b+1),
+        block_delim=',', range_delim='-'):
 
-    blocks = x.split(',')
-    numbers = re.compile(r'(\d+)(-(\d+))?')
+    blocks = x.split(block_delim)
     indices = []
 
     for block in blocks:
@@ -86,13 +87,12 @@ def indices_from_str(x, start=0):
         if not block:
             continue
 
-        match = numbers.match(block)
-        i, j = match.group(1), match.group(3)
+        if range_delim and range_delim in block:
+            begin, end = block.split(range_delim)
+            indices += range(cast(begin), cast(end))
 
-        if j:
-            indices += [k - start for k in range(int(i), int(j)+1)]
         else:
-            indices.append(int(i) - start)
+            indices.append(cast(block))
 
     return indices
 

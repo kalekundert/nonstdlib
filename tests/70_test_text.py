@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import pytest
 from nonstdlib import *
 
 def test_plural():
@@ -43,16 +44,46 @@ def test_pretty_range():
     assert pretty_range([1,3,5,7]) == '1,3,5,7'
 
 def test_indices_from_str():
-    assert indices_from_str('') == []
-    assert indices_from_str('1') == [1]
-    assert indices_from_str('1,2') == [1,2]
-    assert indices_from_str('1-3') == [1,2,3]
-    assert indices_from_str('1,3') == [1,3]
-    assert indices_from_str('1-3,5') == [1,2,3,5]
-    assert indices_from_str('1-3,5,6') == [1,2,3,5,6]
-    assert indices_from_str('1-3,5-7') == [1,2,3,5,6,7]
-    assert indices_from_str('1-3,5,7') == [1,2,3,5,7]
-    assert indices_from_str('1,3,5') == [1,3,5]
-    assert indices_from_str('1,3,5,6') == [1,3,5,6]
-    assert indices_from_str('1,3,5-7') == [1,3,5,6,7]
-    assert indices_from_str('1,3,5,7') == [1,3,5,7]
+    examples_123 = {
+            '': [],
+            '1': [1],
+            '1,2': [1,2],
+            '1-3': [1,2,3],
+            '1,3': [1,3],
+            '1-3,5': [1,2,3,5],
+            '1-3,5,6': [1,2,3,5,6],
+            '1-3,5-7': [1,2,3,5,6,7],
+            '1-3,5,7': [1,2,3,5,7],
+            '1,3,5': [1,3,5],
+            '1,3,5,6': [1,3,5,6],
+            '1,3,5-7': [1,3,5,6,7],
+            '1,3,5,7': [1,3,5,7],
+    }
+    for arg, expected in examples_123.items():
+        assert indices_from_str(arg) == expected
+
+    examples_abc = {
+            '': [],
+            'A': ['A'],
+            'A,B': ['A','B'],
+            'A-C': ['A','B','C'],
+            'A,C': ['A','C'],
+            'A-C,E': ['A','B','C','E'],
+            'A-C,E,F': ['A','B','C','E','F'],
+            'A-C,E-G': ['A','B','C','E','F','G'],
+            'A-C,E,G': ['A','B','C','E','G'],
+            'A,C,E': ['A','C','E'],
+            'A,C,E,F': ['A','C','E','F'],
+            'A,C,E-G': ['A','C','E','F','G'],
+            'A,C,E,G': ['A','C','E','G'],
+    }
+    for arg, expected in examples_abc.items():
+        actual = indices_from_str(
+                arg,
+                cast=str,
+                range=lambda a, b: [chr(x) for x in range(ord(a), ord(b) + 1)],
+        )
+        assert actual == expected
+
+    with pytest.raises(ValueError):
+        indices_from_str('1-2', range_delim=None)
