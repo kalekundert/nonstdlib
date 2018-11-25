@@ -34,6 +34,13 @@ class plural:
         singular, _, plural = suffixes.rpartition("/")
         return "{}{}".format(always, singular if self.value == 1 else plural)
 
+def title(str):
+    print(str)
+    print('━' * len(str))
+
+def section(str):
+    print(str)
+    print('─' * len(str))
 
 def oxford_comma(items, conj='and'):
     if len(items) == 2:
