@@ -7,10 +7,16 @@ def test_plural():
     assert '{:? apple/s}'.format(plural(0)) == '0 apples'
     assert '{:? apple/s}'.format(plural(1)) == '1 apple'
     assert '{:? apple/s}'.format(plural(2)) == '2 apples'
+    assert '{:? apple/s}'.format(plural(range(0))) == '0 apples'
+    assert '{:? apple/s}'.format(plural(range(1))) == '1 apple'
+    assert '{:? apple/s}'.format(plural(range(2))) == '2 apples'
 
     assert '{:/a cactus/? cactii}'.format(plural(0)) == '0 cactii'
     assert '{:/a cactus/? cactii}'.format(plural(1)) == 'a cactus'
     assert '{:/a cactus/? cactii}'.format(plural(2)) == '2 cactii'
+    assert '{:/a cactus/? cactii}'.format(plural(range(0))) == '0 cactii'
+    assert '{:/a cactus/? cactii}'.format(plural(range(1))) == 'a cactus'
+    assert '{:/a cactus/? cactii}'.format(plural(range(2))) == '2 cactii'
 
 def test_oxford_comma():
     assert oxford_comma([]) == ''

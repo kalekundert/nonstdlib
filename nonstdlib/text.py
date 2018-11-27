@@ -29,10 +29,15 @@ class plural:
         self.value = value
 
     def __format__(self, formatter):
-        formatter = formatter.replace("?", str(self.value))
+        from collections.abc import Sized
+
+        x = self.value
+        number = len(x) if isinstance(x, Sized) else self.value
+        formatter = formatter.replace("?", str(number))
         always, _, suffixes = formatter.partition("/")
         singular, _, plural = suffixes.rpartition("/")
-        return "{}{}".format(always, singular if self.value == 1 else plural)
+
+        return "{}{}".format(always, singular if number == 1 else plural)
 
 def title(str):
     print(str)
